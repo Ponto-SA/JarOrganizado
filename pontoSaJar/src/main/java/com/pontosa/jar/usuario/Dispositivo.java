@@ -52,7 +52,7 @@ public class Dispositivo {
             while (rs.next()) {
             idDispositivo = rs.getInt("id");
             }
-
+            
 
             System.out.println(idDispositivo);
 
@@ -60,17 +60,37 @@ public class Dispositivo {
         } catch (Exception e) {
             e.printStackTrace();
         }        
+            List<Double> registros = new ArrayList<>();
+            List<Integer> metricas = new ArrayList<>();
+            
+            registros.add(memoria());
+            metricas.add(2);
+            registros.add(processador());
+            metricas.add(1);
+            registros.add(disco());
+            metricas.add(3);
+            registros.add(memoriaProcessos());
+            metricas.add(5);
+            TesteEmLote te = new TesteEmLote();
+            te.salvarEmLote(registros, idDispositivo, metricas);
                 System.out.println("Entrando no loop");
-                memoria(idDispositivo);
+               // memoria(idDispositivo);
                 System.out.println("Inseriu registro memoria");
-                processador(idDispositivo);
+                //processador(idDispositivo);
                 System.out.println("Inseriu registro processador");
-                temperatura(idDispositivo);
+               // temperatura(idDispositivo);
                 System.out.println("Inseriu registro temperatura");
-                disco(idDispositivo);
+               // disco(idDispositivo);
                 System.out.println("Inseriu Disco");
     }
-
+    
+    public Double memoriaProcessos(){
+      Double usoMemoria = 0.0;
+        for (int i = 0; i < looca.getGrupoDeProcessos().getProcessos().size(); i++){
+            usoMemoria += looca.getGrupoDeProcessos().getProcessos().get(i).getUsoMemoria();
+       }
+        return usoMemoria;
+    }
     
     public void especificacao () {
          Integer idDispositivo = 0;
@@ -152,25 +172,21 @@ public class Dispositivo {
         //yohan yucatan
     }
 
-    public void memoria(Integer idDispositivo) {
-        try{
+    public Double memoria() {
+    
             System.out.println("Teste Memoria");
             Double memoriaUso = Double.longBitsToDouble(looca.getMemoria().getEmUso());
             Double memoriaTotal = Double.longBitsToDouble(looca.getMemoria().getTotal());
             Double memoriaUsoPorc = (memoriaUso / memoriaTotal) * 100;
+               
             if (memoriaUsoPorc > 40){
                 Slack.mensagemSlack(String.format("Novo teste uso de memoria chegou em %.2f", memoriaUsoPorc));
             }
-            Locale.setDefault(Locale.US);
-            String sql = (String.format("INSERT INTO `historico` (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '2', '%.1f')", idDispositivo, memoriaUsoPorc));
-            PreparedStatement pstmt = conexao.getConnection().prepareStatement(sql);
-            pstmt.executeUpdate(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            
+        return memoriaUsoPorc;
     }
 
-    public void disco(Integer idDispositivo) {
+    public Double disco() {
         
        Locale.setDefault(Locale.US);
         
@@ -178,45 +194,17 @@ public class Dispositivo {
        Double tamanhoDisponivel;
        Double emUso;
        Double discoUsoPorc;
-            
-       try{
-          
-               if (disco.getDiscos().size() > 1){
-            for (int i = 0; i < disco.getDiscos().size(); i++){
-              tamanhoTotal = (double) disco.getDiscos().get(i).getTamanho();
-       tamanhoDisponivel = (double) disco.getVolumes().get(i).getDisponivel();
-       emUso = tamanhoTotal - tamanhoDisponivel;
-       discoUsoPorc = (emUso / tamanhoTotal) * 100;
-            String sql = (String.format("INSERT INTO `historico` (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '3', '%.1f')", idDispositivo, discoUsoPorc));
-            PreparedStatement pstmt = conexao.getConnection().prepareStatement(sql);
-            pstmt.executeUpdate(sql);
-            }
-        } else {
+      
                tamanhoTotal = (double) disco.getDiscos().get(0).getTamanho();
        tamanhoDisponivel = (double) disco.getVolumes().get(0).getDisponivel();
        emUso = tamanhoTotal - tamanhoDisponivel;
        discoUsoPorc = (emUso / tamanhoTotal) * 100;
-                   
-                String sql = (String.format("INSERT INTO `historico` (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '3', '%.1f')", idDispositivo, discoUsoPorc));
-            PreparedStatement pstmt = conexao.getConnection().prepareStatement(sql);
-            pstmt.executeUpdate(sql);   
-               }
-           
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                  
+         return discoUsoPorc;
     }
 
-    public void processador(Integer idDispositivo){
-        try{
-            
-            String sql = (String.format("INSERT INTO `historico` (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '1', '%.1f')", idDispositivo, looca.getProcessador().getUso()));
-            Locale.setDefault(Locale.US);
-            PreparedStatement pstmt = conexao.getConnection().prepareStatement(sql);
-            pstmt.executeUpdate(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Double processador(){
+       return looca.getProcessador().getUso();
     }
     
     public void temperatura(Integer idDispositivo) {

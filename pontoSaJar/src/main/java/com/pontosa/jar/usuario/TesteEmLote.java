@@ -13,18 +13,22 @@ public class TesteEmLote {
 
     Dispositivo dispositivo = new Dispositivo();
 
-//    public int[] salvarEmLote(List<String> dispositivos) {
-//        conexaoNuvem.getConnectionTemplate().batchUpdate("INSERT INTO DISPOSITIVOS VALUE (?, ?)", new BatchPreparedStatementSetter() {
-//            @Override
-//            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-//                preparedStatement.setString(1, dispositivos.get(i).getHostName());
-//                preparedStatement.setString(2, dispositivos.get(i).getHostAddress());
-//            }
-//
-//            @Override
-//            public int getBatchSize() {
-//                return dispositivos.size();
-//            }
-//        });
-//    }
+    public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
+        conexaoNuvem.getConnectionTemplate().batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, default)", new BatchPreparedStatementSetter() {
+           @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                preparedStatement.setInt(1, dispositivo);
+                preparedStatement.setInt(2, metricas.get(i));
+                preparedStatement.setDouble(3, dispositivos.get(i));
+                      
+           }
+
+           @Override
+           public int getBatchSize() {
+                return dispositivos.size();
+           }
+       });
+        return null;
+    }
+    
 }

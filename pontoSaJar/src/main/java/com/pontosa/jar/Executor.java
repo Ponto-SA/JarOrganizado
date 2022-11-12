@@ -8,6 +8,8 @@ import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.group.processos.ProcessosGroup;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.discos.Volume;
+import com.pontosa.jar.database.ConexaoNuvem;
+import com.pontosa.jar.usuario.TesteEmLote;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -28,7 +30,12 @@ import java.util.logging.Logger;
 public class Executor { 
     public static void main(String[] args) throws InterruptedException, IOException {       
         Dispositivo dispositivo = new Dispositivo();
-        dispositivo.especificacao();
+        //dispositivo.especificacao();
         dispositivo.loopRegistro();
+        TesteEmLote te = new TesteEmLote();
+        List<Double> teste = new ArrayList<>();
+        List<String> string = new ArrayList<>();
+        
+       
     }        
 }

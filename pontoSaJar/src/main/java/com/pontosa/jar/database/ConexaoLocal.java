@@ -27,7 +27,7 @@ public class ConexaoLocal {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
     private static final String url = "jdbc:mysql://localhost:3306/PontoSa";
     private static final String user = "root";
-    private static final String pass = "Camila@01";
+    private static final String pass = "@110370Cli";
 
 
 
@@ -39,6 +39,6 @@ public class ConexaoLocal {
         } catch (ClassNotFoundException | SQLException ex) {
             throw new RuntimeException("Erro na conexão:", ex);
         }
-
+        
     }
 }

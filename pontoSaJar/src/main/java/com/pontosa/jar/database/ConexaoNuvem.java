@@ -29,11 +29,11 @@ public class ConexaoNuvem {
 
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        dataSource.setUrl("jdbc:mysql://localhost:3306/cybervision");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/PontoSa");
 
         dataSource.setUsername("root");
 
-        dataSource.setPassword("urubu100");
+        dataSource.setPassword("@110370Cli");
 
         this.connection = new JdbcTemplate(dataSource);
     }

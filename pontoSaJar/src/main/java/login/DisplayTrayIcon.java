@@ -15,6 +15,9 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -23,6 +26,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -50,7 +54,14 @@ public class DisplayTrayIcon {
         
         
         final PopupMenu popup = new PopupMenu();        
-        trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("Images/icon.png"));
+          try {
+            InputStream inputStream= ClassLoader.getSystemClassLoader().getResourceAsStream("assets/quad1.png");
+//or getResourceAsStream("/images/Graph.png"); also returns inputstream
+
+            BufferedImage img = ImageIO.read(inputStream);
+    trayIcon = new TrayIcon(img, "S.A. company", popup);
+}
+   catch (IOException e) {}
         final SystemTray tray = SystemTray.getSystemTray();
         
         
