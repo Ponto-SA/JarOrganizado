@@ -194,6 +194,9 @@ public class TelaLogin extends javax.swing.JFrame {
        
        if (existe){
              dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+               VerificarInicializacao teste = new VerificarInicializacao();
+           String[] args = null;
+            teste.main(args);
                 dispositivo.especificacao();
              new Timer().schedule(new TimerTask() {
                  @Override
@@ -243,8 +246,28 @@ public class TelaLogin extends javax.swing.JFrame {
        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+         
+         Dispositivo dispositivo = new Dispositivo();
             public void run() {
-              new TelaLogin().setVisible(true);
+                     Integer teste = 0;
+                    VerificarInicializacao testeClasse = new VerificarInicializacao();
+        teste = testeClasse.teste();
+        if (teste == 1){
+            new TelaLogin().setVisible(false);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        dispositivo.loopRegistro();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            },0,5000);
+        } else {
+            new TelaLogin().setVisible(true);
+        }
+            
               
             }
         });
