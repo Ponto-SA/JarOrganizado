@@ -5,6 +5,7 @@
 package login;
 
 import com.pontosa.jar.database.ConexaoLocal;
+import com.pontosa.jar.database.ConexaoNuvem;
 import java.awt.AWTException;
 import java.awt.Image;
 import java.awt.Menu;
@@ -35,6 +36,9 @@ import javax.swing.JOptionPane;
  * @author yu_mi
  */
 public class DisplayTrayIcon {
+    
+    private static ConexaoLocal conexaoLocal = new ConexaoLocal();
+    private static ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
     
     static TrayIcon trayIcon;
     
@@ -87,13 +91,8 @@ public class DisplayTrayIcon {
             System.out.println("Teste bater ponto");
             
            String sql = (String.format("INSERT INTO ponto(id, saida, fk_usuario) VALUES(null, null, 1)"));
-            PreparedStatement pstmt;
-                try {
-                    pstmt = new ConexaoLocal().getConnection().prepareStatement(sql);
-                     pstmt.executeUpdate(sql);
-                } catch (SQLException ex) {
-                    Logger.getLogger(DisplayTrayIcon.class.getName()).log(Level.SEVERE, null, ex);
-                }
+               conexaoNuvem.getJdbcTemplate().update(sql);
+            conexaoLocal.getConnectionTemplate().update(sql);
             }
         });
         
@@ -110,13 +109,9 @@ public class DisplayTrayIcon {
             
                 
            String sql = (String.format("update ponto set saida = default where fk_usuario = 1 and entrada like '%s'", dataUpdate));
-            PreparedStatement pstmt;
-                try {
-                    pstmt = new ConexaoLocal().getConnection().prepareStatement(sql);
-                     pstmt.executeUpdate(sql);
-                } catch (SQLException ex) {
-                    Logger.getLogger(DisplayTrayIcon.class.getName()).log(Level.SEVERE, null, ex);
-                }
+           
+               conexaoNuvem.getJdbcTemplate().update(sql);
+            conexaoLocal.getConnectionTemplate().update(sql);
             }
         });
         

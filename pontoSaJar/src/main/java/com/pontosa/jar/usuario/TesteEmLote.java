@@ -1,6 +1,6 @@
 package com.pontosa.jar.usuario;
 
-import com.pontosa.jar.database.ConexaoNuvem;
+import com.pontosa.jar.database.ConexaoLocal;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
 import java.sql.PreparedStatement;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TesteEmLote {
 
-    ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
+    ConexaoLocal conexaoNuvem = new ConexaoLocal();
 
     Dispositivo dispositivo = new Dispositivo();
 
