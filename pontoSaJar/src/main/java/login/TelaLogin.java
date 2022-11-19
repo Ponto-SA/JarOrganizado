@@ -7,7 +7,7 @@ package login;
 
 
 import com.pontosa.jar.Executor;
-import com.pontosa.jar.database.ConexaoLocal;
+import com.pontosa.jar.database.ConexaoNuvem;
 import com.pontosa.jar.usuario.Dispositivo;
 import java.awt.Color;  
 import java.awt.event.ComponentAdapter;

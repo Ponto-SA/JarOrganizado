@@ -2,14 +2,15 @@ package com.pontosa.jar;
 
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.Disco;
-import com.pontosa.jar.database.ConexaoLocal;
+import com.pontosa.jar.database.ConexaoNuvem;
 import com.pontosa.jar.usuario.Dispositivo;
 import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.group.processos.ProcessosGroup;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.discos.Volume;
-import com.pontosa.jar.database.ConexaoNuvem;
+import com.pontosa.jar.database.ConexaoLocal;
 import com.pontosa.jar.usuario.TesteEmLote;
+import com.pontosa.jar.usuario.Usuario;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -32,10 +33,6 @@ public class Executor {
         Dispositivo dispositivo = new Dispositivo();
         //dispositivo.especificacao();
         dispositivo.loopRegistro();
-        TesteEmLote te = new TesteEmLote();
-        List<Double> teste = new ArrayList<>();
-        List<String> string = new ArrayList<>();
-        
        
     }        
 }
