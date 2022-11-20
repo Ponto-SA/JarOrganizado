@@ -46,7 +46,19 @@ public class Dispositivo {
     public Map<String, Object> recuperarDispositivoId() {
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
-                    "select id from dispositivo where host_name = ?", getHostName());
+                    "select * from dispositivo where host_name = ?", getHostName());
+          
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    public Map<String, Object> verificarDisco(Integer idDispositivo) {
+        try {
+            Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
+                    "select * from disco where fk_dispositivo = ?", idDispositivo);
           
 
             return registro;
@@ -55,6 +67,18 @@ public class Dispositivo {
         }
     }
 
+    public Map<String, Object> verificarDispositivoLocal(Integer idDispositivo) {
+        try {
+            Map<String, Object> registro = conexaoLocal.getConnectionTemplate().queryForMap(
+                    "select * from dispositivo where id = ?", idDispositivo);
+          
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
     public void loopRegistro() throws InterruptedException {
 
        Map<String, Object> dispositivoMomento = recuperarDispositivoId();
@@ -97,8 +121,23 @@ public class Dispositivo {
     public void especificacao() {
         
     Map<String, Object> dispositivoMomento = recuperarDispositivoId();
-       
-       Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
+        
+    Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
+    String marca = String.valueOf(dispositivoMomento.get("marca"));
+    String modeloDisp = String.valueOf(dispositivoMomento.get("modelo"));
+    String hostname = String.valueOf(dispositivoMomento.get("host_name"));
+    
+    Map<String, Object> dispositivoLocal = verificarDispositivoLocal(idDispositivo);
+        System.out.println("Printando dispositivo Local");
+        System.out.println(dispositivoLocal);
+    Map<String, Object> discoExiste = verificarDisco(idDispositivo);
+    
+    
+    if (dispositivoLocal == null){
+        String sql = String.format("INSERT INTO dispositivo(id, marca, modelo, host_name) VALUES (%d, '%s', '%s', '%s');", idDispositivo,
+                                                                                                                            marca, modeloDisp, hostname);
+        conexaoLocal.getConnectionTemplate().update(sql);
+    }    
       
         
         System.out.println("Teste especificação");
@@ -118,12 +157,18 @@ public class Dispositivo {
                 String modeloDisco = listaDisco.get(i).getModelo().substring(0, listaDisco.get(i).getModelo().indexOf("("));
                 String serialDisco = listaDisco.get(i).getSerial();
                 Double tamanhoDisco = (double) listaDisco.get(i).getTamanho();
-
-                System.out.println("Teste Disco");
+                
+                 
+                 
+                 if (discoExiste == null){
+                     System.out.println("Teste Disco");
                 String sql2 = (String.format("INSERT INTO disco (modelo, numero_serial, tamanho, fk_dispositivo) VALUES ('%s', '%s', %.0f, %d)",
                         modeloDisco, serialDisco, tamanhoDisco, idDispositivo));
                 conexaoNuvem.getJdbcTemplate().update(sql2);
                 conexaoLocal.getConnectionTemplate().update(sql2);
+                 }
+
+                
 
             }
         } else {
@@ -138,10 +183,14 @@ public class Dispositivo {
             listaVolume.get(0).getDisponivel();
             System.out.println(idDispositivo);
             System.out.println("Teste Disco");
+            
+            if (discoExiste == null){
             String sql3 = (String.format("INSERT INTO disco (modelo, numero_serial, tamanho, fk_dispositivo) VALUES ('%s', '%s', %.0f, %d)",
                     modelo, serial, Double.valueOf(String.valueOf(tamanho).substring(0, 3).toString()), idDispositivo));
             conexaoNuvem.getJdbcTemplate().update(sql3);
             conexaoLocal.getConnectionTemplate().update(sql3);
+            }
+            
         }
 
     }
@@ -197,11 +246,32 @@ public class Dispositivo {
 
     public Boolean login(String email, String senha) {
        
-        Map<String, Object> usuarioMomento =  usuario.recuperar(this.usuario, email, senha);
-        
-        
+        Map<String, Object> usuarioMomento =  usuario.recuperar(email, senha);
+        Integer id = Integer.valueOf(String.valueOf(usuarioMomento.get("id")));
+        String nome = String.valueOf(usuarioMomento.get("nome"));
+        String sobrenome = String.valueOf(usuarioMomento.get("sobrenome"));
+        String emailAchado = String.valueOf(usuarioMomento.get("email"));
+        String senhaAchada = String.valueOf(usuarioMomento.get("senha"));
+        String fk_chefe = null;
+        Integer status = Integer.valueOf(String.valueOf(usuarioMomento.get("status")));
+         if (String.valueOf(usuarioMomento.get("fk_chefe")) != null){
+            fk_chefe = String.valueOf(usuarioMomento.get("fk_chefe"));
+             
+        }     
+        System.out.println("Antes de verificar Localmente");
+        Map<String, Object> usuarioLocal =  usuario.verificarLocalmente(id);
+        System.out.println("Depois de verificar Localmente");
+       
 
-        if (Integer.valueOf(String.valueOf(usuarioMomento.get("id"))) > 0) {
+        if (id > 0) {
+             System.out.println("UsuarioExiste");
+        if (usuarioLocal == null){
+            System.out.println("Entrou no if null");
+            String sql = (String.format("INSERT INTO usuario VALUES (%d, '%s', '%s', '%s', '%s', %s, %d);", id, nome, sobrenome, emailAchado,
+                                                                                                                    senhaAchada, fk_chefe,status));
+            conexaoLocal.getConnectionTemplate().update(sql);
+            System.out.println("Executou insert");
+        }
             return true;
         } else {
             return false;
