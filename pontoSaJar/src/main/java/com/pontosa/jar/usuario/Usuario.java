@@ -4,6 +4,7 @@
  */
 package com.pontosa.jar.usuario;
 
+import com.pontosa.jar.database.ConexaoLocal;
 import com.pontosa.jar.database.ConexaoNuvem;
 import java.util.Map;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +14,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
  * @author User
  */
 public class Usuario {
-     private Integer id;
+
+    private Integer id;
     private String nome;
     private String sobrenome;
     private String email;
@@ -22,8 +24,12 @@ public class Usuario {
     private Integer fkChefe;
 
     private ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
-    
-    public Usuario(){};
+    private ConexaoLocal conexaoLocal = new ConexaoLocal();
+
+    public Usuario() {
+    }
+
+    ;
     
     public Usuario(Integer id, String nome, String sobrenome, String email, String senha, Integer status, Integer fkChefe) {
         this.id = id;
@@ -34,17 +40,28 @@ public class Usuario {
         this.status = status;
         this.fkChefe = fkChefe;
     }
-    
-     public Map<String, Object> recuperar(Usuario usuario, String email, String senha) {
-try {
-Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
-"select * from usuario where email = ? and senha = ?", email, senha); 
 
-return registro;
-} catch (EmptyResultDataAccessException e) {
-return null;
-}
-}
+    public Map<String, Object> recuperar(String email, String senha) {
+        try {
+            Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
+                    "select * from usuario where email = ? and senha = ?", email, senha);
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public Map<String, Object> verificarLocalmente(Integer idUsuario) {
+        try {
+            Map<String, Object> registro = conexaoLocal.getConnectionTemplate().queryForMap(
+                    "select * from usuario where id = ? ", idUsuario);
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 
     public Integer getId() {
         return id;
@@ -102,8 +119,6 @@ return null;
         this.fkChefe = fkChefe;
     }
 
-    
-    
     @Override
     public String toString() {
         return "Usuario{" + "id=" + id + ", nome=" + nome + ", sobrenome=" + sobrenome + ", email=" + email + ", senha=" + senha + ", status=" + status + ", fk_chefe=" + fkChefe + '}';
