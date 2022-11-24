@@ -6,6 +6,8 @@ package login;
 
 import com.pontosa.jar.database.ConexaoLocal;
 import com.pontosa.jar.database.ConexaoNuvem;
+import com.pontosa.jar.usuario.Usuario;
+
 import java.awt.AWTException;
 import java.awt.Image;
 import java.awt.Menu;
@@ -22,9 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -39,6 +39,8 @@ public class DisplayTrayIcon {
     
     private static ConexaoLocal conexaoLocal = new ConexaoLocal();
     private static ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
+
+    private static Usuario usuario = new Usuario();
     
     static TrayIcon trayIcon;
     
@@ -53,10 +55,7 @@ public class DisplayTrayIcon {
             System.exit(0);
             return;
         }
-        
-    
-        
-        
+
         final PopupMenu popup = new PopupMenu();        
           try {
             InputStream inputStream= ClassLoader.getSystemClassLoader().getResourceAsStream("assets/quad1.png");
@@ -85,33 +84,37 @@ public class DisplayTrayIcon {
         baterPontoE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
-                
+
+                Map<String, Object> usuarioMomento = usuario.recuperarIdUsuario();
+                Integer id = Integer.valueOf(String.valueOf(usuarioMomento.get("id")));
               
             System.out.println("Teste bater ponto");
             
-           String sql = (String.format("INSERT INTO ponto(id, saida, fk_usuario) VALUES(null, null, 1)"));
+           String sql = (String.format("INSERT INTO ponto(saida, fk_usuario) VALUES(null, %d)", id));
                conexaoNuvem.getJdbcTemplate().update(sql);
-            conexaoLocal.getConnectionTemplate().update(sql);
+               conexaoLocal.getConnectionTemplate().update(sql);
             }
         });
         
           baterPontoS.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                  
+
+                Map<String, Object> usuarioMomento = usuario.recuperarIdUsuario();
+                Integer id = Integer.valueOf(String.valueOf(usuarioMomento.get("id")));
             
             System.out.println("Teste sair ponto");
                 Date data = new Date();
-                    String dataUpdate = (data.toInstant().toString().substring(0, data.toInstant().toString().indexOf("T")) + '%').toString();
+                    String dataUpdate = (data.toInstant().toString().substring(0, data.toInstant().toString().indexOf("T")) + "%").toString();
                     System.out.println(dataUpdate);
                     //dataUpdate += '%';
             
-                
-           String sql = (String.format("update ponto set saida = default where fk_usuario = 1 and entrada like '%s'", dataUpdate));
-           
-               conexaoNuvem.getJdbcTemplate().update(sql);
-            conexaoLocal.getConnectionTemplate().update(sql);
+                String sql = (String.format("update ponto set saida = default where fk_usuario = %d and entrada like '%s'", id, dataUpdate));
+
+                String sql2 = (String.format("UPDATE ponto SET saida = default WHERE fk_usuario = %d AND Convert(VARCHAR(50),entrada, 126) like '%s'", id, dataUpdate));
+
+               conexaoNuvem.getJdbcTemplate().update(sql2);
+               conexaoLocal.getConnectionTemplate().update(sql);
             }
         });
         

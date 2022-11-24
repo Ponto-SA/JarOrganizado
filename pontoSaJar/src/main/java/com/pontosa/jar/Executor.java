@@ -23,16 +23,16 @@ import java.io.IOException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class Executor { 
-    public static void main(String[] args) throws InterruptedException, IOException {       
-        Dispositivo dispositivo = new Dispositivo();
-        //dispositivo.especificacao();
-        dispositivo.loopRegistro();
-       
+    public static void main(String[] args) throws InterruptedException, IOException {
+        Date data = new Date();
+        String dataUpdate = (data.toInstant().toString().substring(0, data.toInstant().toString().indexOf("T")) + "%").toString();
+        System.out.println(dataUpdate);
     }        
 }

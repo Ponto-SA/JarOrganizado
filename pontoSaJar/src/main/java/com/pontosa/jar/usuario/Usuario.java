@@ -23,8 +23,9 @@ public class Usuario {
     private Integer status;
     private Integer fkChefe;
 
-    private ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
+    private static ConexaoNuvem conexaoNuvem = new ConexaoNuvem();
     private ConexaoLocal conexaoLocal = new ConexaoLocal();
+    private static Dispositivo dispositivo = new Dispositivo();
 
     public Usuario() {
     }
@@ -45,6 +46,17 @@ public class Usuario {
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
                     "select * from usuario where email = ? and senha = ?", email, senha);
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public static Map<String, Object> recuperarIdUsuario() {
+        try {
+            Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
+                    "select usuario.id from usuario join usuario_maquina on usuario_maquina.fk_usuario = usuario.id join dispositivo on usuario_maquina.fk_dispositivo = dispositivo.id where dispositivo.host_name = ? and usuario_maquina.ativo = 1;", dispositivo.getHostName());
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
