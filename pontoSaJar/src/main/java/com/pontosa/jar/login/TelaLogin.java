@@ -2,31 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package login;
+package com.pontosa.jar.login;
 
 
 
-import com.pontosa.jar.Executor;
-import com.pontosa.jar.database.ConexaoNuvem;
 import com.pontosa.jar.usuario.Dispositivo;
-import java.awt.Color;  
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.Color;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.WindowConstants;
 
 
 /**

@@ -22,6 +22,8 @@ import com.slack.api.webhook.WebhookResponse;
 import java.io.IOException;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,5 +36,8 @@ public class Executor {
         Date data = new Date();
         String dataUpdate = (data.toInstant().toString().substring(0, data.toInstant().toString().indexOf("T")) + "%").toString();
         System.out.println(dataUpdate);
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        System.out.println(dtf.format(LocalDateTime.now()));
     }        
 }

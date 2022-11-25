@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class ConexaoNuvem {
 
     private JdbcTemplate jdbcTemplate;
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public ConexaoNuvem() {
         BasicDataSource dataSource = new BasicDataSource();
@@ -40,13 +42,13 @@ public class ConexaoNuvem {
     }
     
     public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
-        this.jdbcTemplate.batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, default)", new BatchPreparedStatementSetter() {
+        this.jdbcTemplate.batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
            @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 preparedStatement.setInt(1, dispositivo);
                 preparedStatement.setInt(2, metricas.get(i));
                 preparedStatement.setDouble(3, dispositivos.get(i));
-                      
+                preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
            }
 
            @Override

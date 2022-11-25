@@ -6,6 +6,8 @@ package com.pontosa.jar.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -21,35 +23,37 @@ public class ConexaoLocal {
 
     private static final String driver = "com.mysql.cj.jdbc.Driver";
 
-    private static final String url = "";
+    private static final String url = "jdbc:mysql://localhost:3306/PontoSa";
 
-    private static final String user = "";
+    private static final String user = "root";
 
-    private static final String pass = "";
+    private static final String pass = "temp123";
+
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public ConexaoLocal() {
 
         BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setDriverClassName(driver);
 
-        dataSource.setUrl("jdbc:mysql://localhost:3306/PontoSa");
+        dataSource.setUrl(url);
 
-        dataSource.setUsername("root");
+        dataSource.setUsername(user);
 
-        dataSource.setPassword("temp123");
+        dataSource.setPassword(pass);
 
         this.connection = new JdbcTemplate(dataSource);
     }
     
     public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
-        this.getConnectionTemplate().batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, default)", new BatchPreparedStatementSetter() {
+        this.getConnectionTemplate().batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
            @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 preparedStatement.setInt(1, dispositivo);
                 preparedStatement.setInt(2, metricas.get(i));
                 preparedStatement.setDouble(3, dispositivos.get(i));
-                      
+                preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
            }
 
            @Override

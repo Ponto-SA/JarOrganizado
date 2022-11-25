@@ -15,6 +15,7 @@ import com.github.britooo.looca.api.group.processos.Processo;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -168,10 +169,6 @@ public class Dispositivo {
             conexaoNuvem.getJdbcTemplate().update(sql3);
             conexaoLocal.getConnectionTemplate().update(sql3);
             }
-    }
-
-    public void processos() {
-        //yohan yucatan
     }
 
     public Double memoria() {
