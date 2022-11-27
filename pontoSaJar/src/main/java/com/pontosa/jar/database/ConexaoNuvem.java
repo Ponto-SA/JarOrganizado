@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,17 +30,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class ConexaoNuvem {
 
     private JdbcTemplate jdbcTemplate;
+
+    private static final String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+
+    private static final String url = "jdbc:sqlserver://ponto-sa.database.windows.net:1433;database=PontoSa;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;";
+
+    private static final String user = "PontoSa";
+
+    private static final String pass = "Camila@01";
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public ConexaoNuvem() {
-        try{
+        try {
             BasicDataSource dataSource = new BasicDataSource();
-            dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-// exemplo para MySql: "com.mysql.cj.jdbc.Driver"
-            dataSource.setUrl("jdbc:sqlserver://ponto-sa.database.windows.net:1433;database=PontoSa;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;");
-// exemplo para MySql: "jdbc:mysql://localhost:3306/meubanco"
-            dataSource.setUsername("PontoSa");
-            dataSource.setPassword("Camila@01");
+
+            dataSource.setDriverClassName(driver);
+
+            dataSource.setUrl(url);
+
+            dataSource.setUsername(user);
+
+            dataSource.setPassword(pass);
+
             jdbcTemplate = new JdbcTemplate(dataSource);
         } catch (Exception e) {
             LogError log = new LogError("ConexaoNuvem");

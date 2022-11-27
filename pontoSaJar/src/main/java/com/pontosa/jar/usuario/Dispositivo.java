@@ -35,7 +35,7 @@ public class Dispositivo {
     private ConexaoLocal conexaoLocal = new ConexaoLocal();
     private Slack slack = new Slack();
     private Usuario usuario = new Usuario();
-    
+
     private String hostName;
 
     private String hostAddress;
@@ -53,7 +53,7 @@ public class Dispositivo {
             return registro;
         } catch (EmptyResultDataAccessException e) {
             log.adicionarLog(String.format(
-                    "Não foi encontrado nenhuma informação: %s",
+                    "Não foi encontrado nenhuma informação do dispositivo: %s",
                     e.getStackTrace()));
             return null;
         }
@@ -67,7 +67,7 @@ public class Dispositivo {
             return registro;
         } catch (EmptyResultDataAccessException e) {
             log.adicionarLog(String.format(
-                    "Não foi encontrado nenhuma informação: %s",
+                    "Não foi encontrado nenhuma informação sobre o disco: %s",
                     e.getStackTrace()));
             return null;
         }
@@ -88,7 +88,7 @@ public class Dispositivo {
     }
 
     public void loopRegistro() throws InterruptedException {
-        
+
         try {
             Map<String, Object> dispositivoMomento = recuperarDispositivoId();
 
@@ -118,7 +118,7 @@ public class Dispositivo {
             System.out.println("Inseriu Disco");
         } catch (NullPointerException e) {
             log.adicionarLog(String.format(
-                    "Dispositivo associado não encontrado: %s",
+                    "Não foi possivel obter as medidas: %s",
                     e.getStackTrace()));
         }
     }
@@ -130,9 +130,9 @@ public class Dispositivo {
             usoMemoria += list.get(i).getUsoMemoria();
         }
         if (usoMemoria > 45) {
-            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com %.2f % de uso", this.getHostName(), usoMemoria));
+            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com os processos consumindo %.2f%% da memoria", this.getHostName(), usoMemoria));
         }
-        
+
         return usoMemoria;
     }
 
@@ -193,7 +193,7 @@ public class Dispositivo {
         Double memoriaUsoPorc = (memoriaUso / memoriaTotal) * 100;
 
         if (memoriaUsoPorc > 85) {
-            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com %.2f % de uso", this.getHostName(), memoriaUsoPorc));
+            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com %.2f%% da memoria em uso", this.getHostName(), memoriaUsoPorc));
         }
 
         return memoriaUsoPorc;
@@ -213,16 +213,17 @@ public class Dispositivo {
         emUso = tamanhoTotal - tamanhoDisponivel;
         discoUsoPorc = (emUso / tamanhoTotal) * 100;
         if (discoUsoPorc > 90) {
-            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f% em uso",this.getHostName(), discoUsoPorc));
+            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f%% de uso do disco",this.getHostName(), discoUsoPorc));
         }
 
         return discoUsoPorc;
     }
 
     public Double processador() {
+        System.out.println("Teste processador");
         Double usoProc = looca.getProcessador().getUso();
          if (usoProc > 90) {
-            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f% em uso",this.getHostName(), usoProc));
+            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f%% em uso do processador",this.getHostName(), usoProc));
         }
         return usoProc;
     }
@@ -240,6 +241,11 @@ public class Dispositivo {
     public Boolean login(String email, String senha) {
 
         Map<String, Object> usuarioMomento = usuario.recuperar(email, senha);
+
+        if (usuarioMomento == null) {
+            return false;
+        }
+
         Integer id = Integer.valueOf(String.valueOf(usuarioMomento.get("id")));
         String nome = String.valueOf(usuarioMomento.get("nome"));
         String sobrenome = String.valueOf(usuarioMomento.get("sobrenome"));
