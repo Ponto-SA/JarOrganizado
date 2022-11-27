@@ -5,6 +5,7 @@ import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.discos.Volume;
 import com.github.britooo.looca.api.group.processos.ProcessosGroup;
+import com.pontosa.jar.log.LogError;
 import com.pontosa.jar.slack.Slack;
 import com.pontosa.jar.usuario.Dispositivo;
 
@@ -31,34 +32,38 @@ public class ConexaoNuvem {
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     public ConexaoNuvem() {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try{
+            BasicDataSource dataSource = new BasicDataSource();
+            dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 // exemplo para MySql: "com.mysql.cj.jdbc.Driver"
-        dataSource.setUrl("jdbc:sqlserver://ponto-sa.database.windows.net:1433;database=PontoSa;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;");
+            dataSource.setUrl("jdbc:sqlserver://ponto-sa.database.windows.net:1433;database=PontoSa;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;");
 // exemplo para MySql: "jdbc:mysql://localhost:3306/meubanco"
-        dataSource.setUsername("PontoSa");
-        dataSource.setPassword("Camila@01");
-        jdbcTemplate = new JdbcTemplate(dataSource);
+            dataSource.setUsername("PontoSa");
+            dataSource.setPassword("Camila@01");
+            jdbcTemplate = new JdbcTemplate(dataSource);
+        } catch (Exception e) {
+            LogError log = new LogError("ConexaoNuvem");
+            log.adicionarLog(String.format("%s", e.getStackTrace()));
+        }
     }
-    
+
     public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
         this.jdbcTemplate.batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
-           @Override
+            @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 preparedStatement.setInt(1, dispositivo);
                 preparedStatement.setInt(2, metricas.get(i));
                 preparedStatement.setDouble(3, dispositivos.get(i));
                 preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
-           }
+            }
 
-           @Override
-           public int getBatchSize() {
+            @Override
+            public int getBatchSize() {
                 return dispositivos.size();
-           }
-       });
+            }
+        });
         return null;
     }
-    
 
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;

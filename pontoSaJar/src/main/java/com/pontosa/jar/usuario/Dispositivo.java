@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.PreparedStatement;
 import com.github.britooo.looca.api.group.processos.Processo;
+import com.pontosa.jar.log.LogError;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ import java.util.Map;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 public class Dispositivo {
-
+    LogError log = new LogError("Dispositivo");
     private Looca looca = new Looca();
     private LocalDateTime dt = LocalDateTime.now();
     private DiscosGroup disco = new DiscosGroup();
@@ -34,7 +35,7 @@ public class Dispositivo {
     private ConexaoLocal conexaoLocal = new ConexaoLocal();
     private Slack slack = new Slack();
     private Usuario usuario = new Usuario();
-
+    
     private String hostName;
 
     private String hostAddress;
@@ -48,22 +49,26 @@ public class Dispositivo {
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
                     "select * from dispositivo where host_name = ?", getHostName());
-          
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format(
+                    "Não foi encontrado nenhuma informação: %s",
+                    e.getStackTrace()));
             return null;
         }
     }
-    
+
     public Map<String, Object> verificarDisco(Integer idDispositivo) {
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
                     "select * from disco where fk_dispositivo = ?", idDispositivo);
-          
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format(
+                    "Não foi encontrado nenhuma informação: %s",
+                    e.getStackTrace()));
             return null;
         }
     }
@@ -72,42 +77,50 @@ public class Dispositivo {
         try {
             Map<String, Object> registro = conexaoLocal.getConnectionTemplate().queryForMap(
                     "select * from dispositivo where id = ?", idDispositivo);
-          
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format(
+                    "Não foi encontrado nenhuma informação: %s",
+                    e.getStackTrace()));
             return null;
         }
     }
-    
+
     public void loopRegistro() throws InterruptedException {
+        
+        try {
+            Map<String, Object> dispositivoMomento = recuperarDispositivoId();
 
-       Map<String, Object> dispositivoMomento = recuperarDispositivoId();
-       
-       Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
-       
-        List<Double> registros = new ArrayList<>();
-        List<Integer> metricas = new ArrayList<>();
+            Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
 
-        registros.add(memoria());
-        metricas.add(2);
-        registros.add(processador());
-        metricas.add(1);
-        registros.add(disco());
-        metricas.add(3);
-        registros.add(memoriaProcessos());
-        metricas.add(5);
-        conexaoLocal.salvarEmLote(registros, idDispositivo, metricas);
-        conexaoNuvem.salvarEmLote(registros, idDispositivo, metricas);
-        System.out.println("Entrando no loop");
-        // memoria(idDispositivo);
-        System.out.println("Inseriu registro memoria");
-        //processador(idDispositivo);
-        System.out.println("Inseriu registro processador");
-        // temperatura(idDispositivo);
-        System.out.println("Inseriu registro temperatura");
-        // disco(idDispositivo);
-        System.out.println("Inseriu Disco");
+            List<Double> registros = new ArrayList<>();
+            List<Integer> metricas = new ArrayList<>();
+
+            registros.add(memoria());
+            metricas.add(2);
+            registros.add(processador());
+            metricas.add(1);
+            registros.add(disco());
+            metricas.add(3);
+            registros.add(memoriaProcessos());
+            metricas.add(5);
+            conexaoLocal.salvarEmLote(registros, idDispositivo, metricas);
+            conexaoNuvem.salvarEmLote(registros, idDispositivo, metricas);
+            System.out.println("Entrando no loop");
+            // memoria(idDispositivo);
+            System.out.println("Inseriu registro memoria");
+            //processador(idDispositivo);
+            System.out.println("Inseriu registro processador");
+            // temperatura(idDispositivo);
+            System.out.println("Inseriu registro temperatura");
+            // disco(idDispositivo);
+            System.out.println("Inseriu Disco");
+        } catch (NullPointerException e) {
+            log.adicionarLog(String.format(
+                    "Dispositivo associado não encontrado: %s",
+                    e.getStackTrace()));
+        }
     }
 
     public Double memoriaProcessos() {
@@ -120,55 +133,52 @@ public class Dispositivo {
     }
 
     public void especificacao() {
-        
-    Map<String, Object> dispositivoMomento = recuperarDispositivoId();
-        
-    Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
-    String marca = String.valueOf(dispositivoMomento.get("marca"));
-    String modeloDisp = String.valueOf(dispositivoMomento.get("modelo"));
-    String hostname = String.valueOf(dispositivoMomento.get("host_name"));
-    
-    Map<String, Object> dispositivoLocal = verificarDispositivoLocal(idDispositivo);
+
+        Map<String, Object> dispositivoMomento = recuperarDispositivoId();
+
+        Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoMomento.get("id")));
+        String marca = String.valueOf(dispositivoMomento.get("marca"));
+        String modeloDisp = String.valueOf(dispositivoMomento.get("modelo"));
+        String hostname = String.valueOf(dispositivoMomento.get("host_name"));
+
+        Map<String, Object> dispositivoLocal = verificarDispositivoLocal(idDispositivo);
         System.out.println("Printando dispositivo Local");
         System.out.println(dispositivoLocal);
-    Map<String, Object> discoExiste = verificarDisco(idDispositivo);
-    
-    
-    if (dispositivoLocal == null){
-        String sql = String.format("INSERT INTO dispositivo(id, marca, modelo, host_name) VALUES (%d, '%s', '%s', '%s');", idDispositivo,
-                                                                                                                            marca, modeloDisp, hostname);
-        conexaoLocal.getConnectionTemplate().update(sql);
-    }    
-      
-        
+        Map<String, Object> discoExiste = verificarDisco(idDispositivo);
+
+        if (dispositivoLocal == null) {
+            String sql = String.format("INSERT INTO dispositivo(id, marca, modelo, host_name) VALUES (%d, '%s', '%s', '%s');", idDispositivo,
+                    marca, modeloDisp, hostname);
+            conexaoLocal.getConnectionTemplate().update(sql);
+        }
+
         System.out.println("Teste especificação");
         Double memoriaTotal = Double.valueOf((looca.getMemoria().getTotal() / 1024) / 1024) / 1024;
         Locale.setDefault(Locale.US);
         System.out.println(memoriaTotal);
         String sql = (String.format("UPDATE dispositivo SET tipo_processador = '%s', memoria_total = '%.2f', sistema_operacional = '%s' WHERE host_name = '%s'",
-                looca.getProcessador().getNome(), memoriaTotal, looca.getSistema().getSistemaOperacional() ,getHostName()));
+                looca.getProcessador().getNome(), memoriaTotal, looca.getSistema().getSistemaOperacional(), getHostName()));
         conexaoNuvem.getJdbcTemplate().update(sql);
         conexaoLocal.getConnectionTemplate().update(sql);
 
-
-            Locale.setDefault(Locale.US);
-            System.out.println(disco.getDiscos());
-            System.out.println(disco.getDiscos().size());
+        Locale.setDefault(Locale.US);
+        System.out.println(disco.getDiscos());
+        System.out.println(disco.getDiscos().size());
 //            String modelo = disco.getDiscos().get(0).getModelo().substring(0, disco.getDiscos().get(0).getModelo().indexOf("("));
 //            String serial = disco.getDiscos().get(0).getSerial();
-            Long tamanho = (disco.getDiscos().get(0).getTamanho());
-            System.out.println(tamanho);
-            listaVolume.add(disco.getVolumes().get(0));
-            listaVolume.get(0).getDisponivel();
-            System.out.println(idDispositivo);
-            System.out.println("Teste Disco");
-            
-            if (discoExiste == null){
+        Long tamanho = (disco.getDiscos().get(0).getTamanho());
+        System.out.println(tamanho);
+        listaVolume.add(disco.getVolumes().get(0));
+        listaVolume.get(0).getDisponivel();
+        System.out.println(idDispositivo);
+        System.out.println("Teste Disco");
+
+        if (discoExiste == null) {
             String sql3 = (String.format("INSERT INTO disco (tamanho, fk_dispositivo) VALUES (%.0f, %d)",
-                     Double.valueOf(String.valueOf(tamanho).substring(0, 3).toString()), idDispositivo));
+                    Double.valueOf(String.valueOf(tamanho).substring(0, 3).toString()), idDispositivo));
             conexaoNuvem.getJdbcTemplate().update(sql3);
             conexaoLocal.getConnectionTemplate().update(sql3);
-            }
+        }
     }
 
     public Double memoria() {
@@ -207,18 +217,18 @@ public class Dispositivo {
     }
 
     public void temperatura(Integer idDispositivo) {
-       
-            System.out.println("Teste especificação");
-            String sql = (String.format("INSERT INTO historico (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '4', %.1f)", idDispositivo, looca.getTemperatura().getTemperatura()));
-            Locale.setDefault(Locale.US);
-           conexaoNuvem.getJdbcTemplate().update(sql);
-            conexaoLocal.getConnectionTemplate().update(sql);
-        
+
+        System.out.println("Teste especificação");
+        String sql = (String.format("INSERT INTO historico (fk_dispositivo, fk_tipo_metrica, registro) VALUES ('%d', '4', %.1f)", idDispositivo, looca.getTemperatura().getTemperatura()));
+        Locale.setDefault(Locale.US);
+        conexaoNuvem.getJdbcTemplate().update(sql);
+        conexaoLocal.getConnectionTemplate().update(sql);
+
     }
 
     public Boolean login(String email, String senha) {
-       
-        Map<String, Object> usuarioMomento =  usuario.recuperar(email, senha);
+
+        Map<String, Object> usuarioMomento = usuario.recuperar(email, senha);
         Integer id = Integer.valueOf(String.valueOf(usuarioMomento.get("id")));
         String nome = String.valueOf(usuarioMomento.get("nome"));
         String sobrenome = String.valueOf(usuarioMomento.get("sobrenome"));
@@ -228,19 +238,18 @@ public class Dispositivo {
         Integer status = Integer.valueOf(String.valueOf(usuarioMomento.get("status")));
 
         System.out.println("Antes de verificar Localmente");
-        Map<String, Object> usuarioLocal =  usuario.verificarLocalmente(id);
+        Map<String, Object> usuarioLocal = usuario.verificarLocalmente(id);
         System.out.println("Depois de verificar Localmente");
-       
 
         if (id > 0) {
-             System.out.println("UsuarioExiste");
-        if (usuarioLocal == null){
-            System.out.println("Entrou no if null");
-            String sql = (String.format("INSERT INTO usuario VALUES (%d, '%s', '%s', '%s', '%s', %d, %s);", id, nome, sobrenome, emailAchado,
-                                                                                                                    senhaAchada, status, fk_chefe));
-            conexaoLocal.getConnectionTemplate().update(sql);
-            System.out.println("Executou insert");
-        }
+            System.out.println("UsuarioExiste");
+            if (usuarioLocal == null) {
+                System.out.println("Entrou no if null");
+                String sql = (String.format("INSERT INTO usuario VALUES (%d, '%s', '%s', '%s', '%s', %d, %s);", id, nome, sobrenome, emailAchado,
+                        senhaAchada, status, fk_chefe));
+                conexaoLocal.getConnectionTemplate().update(sql);
+                System.out.println("Executou insert");
+            }
             return true;
         } else {
             return false;
@@ -252,7 +261,7 @@ public class Dispositivo {
         try {
             return hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.adicionarLog(String.format("HostName não encontrado: %s", e.getStackTrace()));
             return null;
         }
     }
@@ -261,7 +270,8 @@ public class Dispositivo {
         try {
             return hostAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.adicionarLog(String.format(
+                    "HostAddress não encontrado: %s", e.getStackTrace()));
             return null;
         }
     }
