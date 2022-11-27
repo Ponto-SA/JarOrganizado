@@ -27,7 +27,7 @@ public class ConexaoLocal {
 
     private static final String user = "root";
 
-    private static final String pass = "temp123";
+    private static final String pass = "Mello@179";
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 

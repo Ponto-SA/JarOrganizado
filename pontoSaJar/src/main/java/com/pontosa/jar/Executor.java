@@ -9,6 +9,7 @@ import com.github.britooo.looca.api.group.processos.ProcessosGroup;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.discos.Volume;
 import com.pontosa.jar.database.ConexaoLocal;
+import com.pontosa.jar.log.LogError;
 import com.pontosa.jar.usuario.TesteEmLote;
 import com.pontosa.jar.usuario.Usuario;
 import com.slack.api.Slack;
@@ -36,7 +37,6 @@ public class Executor {
         Date data = new Date();
         String dataUpdate = (data.toInstant().toString().substring(0, data.toInstant().toString().indexOf("T")) + "%").toString();
         System.out.println(dataUpdate);
-
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         System.out.println(dtf.format(LocalDateTime.now()));
     }        

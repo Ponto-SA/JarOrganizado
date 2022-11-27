@@ -1,5 +1,6 @@
 package com.pontosa.jar.log;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,22 +29,34 @@ public class LogError {
         String dataNow = dataLog.format(data);
         String horaNow = hora.format(data);
         try {
-            this.createLogArq("\n[" + dataNow + " - " + horaNow + "] - " + error);
+            this.createLogArq("\n[" + dataNow + " - " + horaNow + "] - erro - " 
+                    + error);
         } catch (Exception e) {
+            
         }
     };
     
     private void createLogArq(String texto) throws IOException {
 
         Calendar cal = Calendar.getInstance();
-        LocalDate dataAtual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Integer anoAtual = cal.get(Calendar.YEAR);
         Integer mesAtual = cal.get(Calendar.MONTH) + 1; //O primeiro mês começa com 0
         Integer diaAtual = cal.get(Calendar.DAY_OF_MONTH);
-
-        FileWriter arq = new FileWriter("./logs/log-" + nomeLog + "["
-                + anoAtual + mesAtual + diaAtual + "].txt", true);
+        Integer horaAtual = cal.get(Calendar.HOUR_OF_DAY);
+        Integer minutoAtual = cal.get(Calendar.MINUTE);
+        Integer segundoAtual = cal.get(Calendar.SECOND);
+        String momentoAtual = String.format("-%d-%d-%d", horaAtual,
+                minutoAtual, segundoAtual);
+        
+        File D = new File("./LogsPontoSa"); 
+        String pathLogCrate = "./LogsPontoSa/Classe-" + nomeLog + "["
+                + anoAtual + mesAtual + diaAtual + "]";
+        File pathLog = new File(pathLogCrate);
+        D.mkdir();
+        pathLog.mkdir();
+        FileWriter arq = new FileWriter( pathLogCrate +"/log-" + nomeLog + "["
+                + anoAtual + mesAtual + diaAtual + momentoAtual + "].txt", true);
 
         PrintWriter gravarArq = new PrintWriter(arq);
 

@@ -4,8 +4,7 @@
  */
 package com.pontosa.jar.login;
 
-
-
+import com.pontosa.jar.log.LogError;
 import com.pontosa.jar.usuario.Dispositivo;
 import java.awt.Color;
 import java.awt.*;
@@ -15,36 +14,35 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
-
 /**
  *
  * @author yu_mi
  */
 public class TelaLogin extends javax.swing.JFrame {
-       
+
+    LogError log = new LogError("Tela-Login");
     DisplayTrayIcon DTI = new DisplayTrayIcon();
-    
-    public static void centralizarTela(Window frame){
+
+    public static void centralizarTela(Window frame) {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (int) ((dimension.getWidth() - frame.getWidth()) / 2);
         int y = (int) ((dimension.getHeight() - frame.getHeight()) / 2);
         frame.setLocation(x, y);
     }
-    
+
     /**
      * Creates new form TelaLogin
      */
     public TelaLogin() {
-        
+
         initComponents();
         getContentPane().setBackground(Color.BLACK);
         centralizarTela(this);
         setDefaultCloseOperation(this.HIDE_ON_CLOSE);
-        
+
         ImageIcon icone = new ImageIcon("../src/main/Images/Logo");
         setIconImage(icone.getImage());
-        
-        
+
     }
 
     /**
@@ -172,42 +170,46 @@ public class TelaLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-       String email = txtUsername.getText();
-       String senha = pfPassword.getText();
-       
+
+        String email = txtUsername.getText();
+        String senha = pfPassword.getText();
+
         Dispositivo dispositivo = new Dispositivo();
-        
-        Boolean existe =  dispositivo.login(email, senha);
-       
-       if (existe){
-             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-               VerificarInicializacao teste = new VerificarInicializacao();
-           String[] args = null;
+
+        Boolean existe = dispositivo.login(email, senha);
+
+        if (existe) {
+            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+            VerificarInicializacao teste = new VerificarInicializacao();
+            String[] args = null;
             teste.main(args);
-                dispositivo.especificacao();
-             new Timer().schedule(new TimerTask() {
-                 @Override
-                 public void run() {
-                      try {
-                          dispositivo.loopRegistro();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-                 }
-             },0,5000);
-       } else {
-           JOptionPane.showMessageDialog(null, "Email e/ou senha inválidos",
-                   "Erro de validação", JOptionPane.ERROR_MESSAGE);
-       }
-       
-       
+            dispositivo.especificacao();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        dispositivo.loopRegistro();
+                    } catch (Exception e) {
+                        log.adicionarLog(String.format(
+                                "Não foi possivel inserir os dados: %s",
+                                e.getStackTrace()));
+                    }
+                }
+            }, 0, 5000);
+        } else {
+            JOptionPane.showMessageDialog(null, "Email e/ou senha inválidos",
+                    "Erro de validação", JOptionPane.ERROR_MESSAGE);
+            log.adicionarLog("Email e/ou senha inválidos");
+        }
+
+
     }//GEN-LAST:event_btnEntrarActionPerformed
-        
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-       
+        LogError log = new LogError("Tela-Login");
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -230,32 +232,34 @@ public class TelaLogin extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-       
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-         
-         Dispositivo dispositivo = new Dispositivo();
+
+            Dispositivo dispositivo = new Dispositivo();
+
             public void run() {
-                     Integer teste = 0;
-                    VerificarInicializacao testeClasse = new VerificarInicializacao();
-        teste = testeClasse.teste();
-        if (teste == 1){
-            new TelaLogin().setVisible(false);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        dispositivo.loopRegistro();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Integer teste = 0;
+                VerificarInicializacao testeClasse = new VerificarInicializacao();
+                teste = testeClasse.teste();
+                if (teste == 1) {
+                    new TelaLogin().setVisible(false);
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            try {
+                                dispositivo.loopRegistro();
+                            } catch (Exception e) {
+                                log.adicionarLog(String.format(
+                                        "Não foi possivel inserir os dados: %s",
+                                        e.getStackTrace()));
+                            }
+                        }
+                    }, 0, 5000);
+                } else {
+                    new TelaLogin().setVisible(true);
                 }
-            },0,5000);
-        } else {
-            new TelaLogin().setVisible(true);
-        }
-            
-              
+
             }
         });
     }
