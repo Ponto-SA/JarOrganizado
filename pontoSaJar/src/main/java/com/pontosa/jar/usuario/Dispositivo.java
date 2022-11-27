@@ -129,6 +129,10 @@ public class Dispositivo {
         for (int i = 0; i < list.size(); i++) {
             usoMemoria += list.get(i).getUsoMemoria();
         }
+        if (usoMemoria > 45) {
+            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com %.2f % de uso", this.getHostName(), usoMemoria));
+        }
+        
         return usoMemoria;
     }
 
@@ -188,8 +192,8 @@ public class Dispositivo {
         Double memoriaTotal = Double.longBitsToDouble(looca.getMemoria().getTotal());
         Double memoriaUsoPorc = (memoriaUso / memoriaTotal) * 100;
 
-        if (memoriaUsoPorc > 40) {
-            Slack.mensagemSlack(String.format("Novo teste uso de memoria chegou em %.2f", memoriaUsoPorc));
+        if (memoriaUsoPorc > 85) {
+            Slack.mensagemSlack(String.format("O dispositivo com Hostname de %s esta com %.2f % de uso", this.getHostName(), memoriaUsoPorc));
         }
 
         return memoriaUsoPorc;
@@ -208,12 +212,19 @@ public class Dispositivo {
         tamanhoDisponivel = (double) disco.getVolumes().get(0).getDisponivel();
         emUso = tamanhoTotal - tamanhoDisponivel;
         discoUsoPorc = (emUso / tamanhoTotal) * 100;
+        if (discoUsoPorc > 90) {
+            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f% em uso",this.getHostName(), discoUsoPorc));
+        }
 
         return discoUsoPorc;
     }
 
     public Double processador() {
-        return looca.getProcessador().getUso();
+        Double usoProc = looca.getProcessador().getUso();
+         if (usoProc > 90) {
+            Slack.mensagemSlack(String.format("O dispositivo com o Hostname de %s esta com %.2f% em uso",this.getHostName(), usoProc));
+        }
+        return usoProc;
     }
 
     public void temperatura(Integer idDispositivo) {
