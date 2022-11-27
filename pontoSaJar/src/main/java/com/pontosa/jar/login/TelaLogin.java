@@ -9,6 +9,7 @@ import com.pontosa.jar.usuario.Dispositivo;
 import java.awt.Color;
 import java.awt.*;
 import java.awt.event.WindowEvent;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -185,6 +186,9 @@ public class TelaLogin extends javax.swing.JFrame {
             VerificarInicializacao teste = new VerificarInicializacao();
             String[] args = null;
             teste.main(args);
+            Map<String, Object> dispositivoId = dispositivo.recuperarDispositivoId(email);
+            Integer idDispositivo = Integer.valueOf(String.valueOf(dispositivoId.get("id")));
+            dispositivo.updateHostname(idDispositivo);
             dispositivo.especificacao();
             new Timer().schedule(new TimerTask() {
                 @Override
@@ -203,8 +207,6 @@ public class TelaLogin extends javax.swing.JFrame {
                     "Erro de validação", JOptionPane.ERROR_MESSAGE);
             log.adicionarLog("Email e/ou senha inválidos");
         }
-
-
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     /**

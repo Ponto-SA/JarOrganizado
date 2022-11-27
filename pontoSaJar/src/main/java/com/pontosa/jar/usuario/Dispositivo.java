@@ -87,6 +87,21 @@ public class Dispositivo {
         }
     }
 
+    public void updateHostname(Integer id){
+        String sql = String.format("update dispositivo set host_name = '%s' where id = %d", this.getHostName(), id);
+        conexaoNuvem.getJdbcTemplate().update(sql);
+    }
+    public Map<String, Object> recuperarDispositivoId(String email) {
+        try {
+            Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
+                    "select dispositivo.id from dispositivo inner join usuario_maquina on dispositivo.id = usuario_maquina.fk_dispositivo inner join usuario on usuario.id = usuario_maquina.fk_usuario where usuario.email = ?", email);
+
+            return registro;
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     public void loopRegistro() throws InterruptedException {
 
         try {
@@ -235,7 +250,6 @@ public class Dispositivo {
         Locale.setDefault(Locale.US);
         conexaoNuvem.getJdbcTemplate().update(sql);
         conexaoLocal.getConnectionTemplate().update(sql);
-
     }
 
     public Boolean login(String email, String senha) {
@@ -279,16 +293,6 @@ public class Dispositivo {
             return hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             log.adicionarLog(String.format("HostName não encontrado: %s", e.getStackTrace()));
-            return null;
-        }
-    }
-
-    public String getHostAddress() {
-        try {
-            return hostAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            log.adicionarLog(String.format(
-                    "HostAddress não encontrado: %s", e.getStackTrace()));
             return null;
         }
     }
