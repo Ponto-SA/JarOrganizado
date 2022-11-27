@@ -178,6 +178,8 @@ public class TelaLogin extends javax.swing.JFrame {
 
         Boolean existe = dispositivo.login(email, senha);
 
+        System.out.println(existe);
+
         if (existe) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             VerificarInicializacao teste = new VerificarInicializacao();

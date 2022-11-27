@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 
 public class ConexaoLocal {
-    
+
     private JdbcTemplate connection;
 
     private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -27,7 +28,7 @@ public class ConexaoLocal {
 
     private static final String user = "root";
 
-    private static final String pass = "Mello@179";
+    private static final String pass = "Camila@01";
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
@@ -45,25 +46,25 @@ public class ConexaoLocal {
 
         this.connection = new JdbcTemplate(dataSource);
     }
-    
+
     public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
         this.getConnectionTemplate().batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
-           @Override
+            @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 preparedStatement.setInt(1, dispositivo);
                 preparedStatement.setInt(2, metricas.get(i));
                 preparedStatement.setDouble(3, dispositivos.get(i));
                 preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
-           }
+            }
 
-           @Override
-           public int getBatchSize() {
+            @Override
+            public int getBatchSize() {
                 return dispositivos.size();
-           }
-       });
+            }
+        });
         return null;
     }
-    
+
 
     public JdbcTemplate getConnectionTemplate() {
         return connection;
