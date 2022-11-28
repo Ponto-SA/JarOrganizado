@@ -29,6 +29,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ConexaoNuvem {
 
+    LogError log = new LogError("ConexaoNuvem");
+
     private JdbcTemplate jdbcTemplate;
 
     private static final String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -63,10 +65,15 @@ public class ConexaoNuvem {
         this.jdbcTemplate.batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                preparedStatement.setInt(1, dispositivo);
-                preparedStatement.setInt(2, metricas.get(i));
-                preparedStatement.setDouble(3, dispositivos.get(i));
-                preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
+                try {
+                    preparedStatement.setInt(1, dispositivo);
+                    preparedStatement.setInt(2, metricas.get(i));
+                    preparedStatement.setDouble(3, dispositivos.get(i));
+                    preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
+                } catch (Exception e) {
+                    log.adicionarLog(String.format("Erro no salvamento em Lote: %s",
+                            e.getStackTrace()));
+                }
             }
 
             @Override

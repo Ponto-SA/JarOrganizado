@@ -14,7 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
  * @author User
  */
 public class Usuario {
-
+    LogError log = new LogError("Usuario");
     private Integer id;
     private String nome;
     private String sobrenome;
@@ -49,17 +49,20 @@ public class Usuario {
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format("Erro ao logar: %s", e.getStackTrace()));
             return null;
         }
     }
 
     public static Map<String, Object> recuperarIdUsuario() {
+        LogError log = new LogError("Usuario");
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
                     "select usuario.id from usuario join usuario_maquina on usuario_maquina.fk_usuario = usuario.id join dispositivo on usuario_maquina.fk_dispositivo = dispositivo.id where dispositivo.host_name = ? and usuario_maquina.ativo = 1;", dispositivo.getHostName());
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format("Erro ao logar: %s", e.getStackTrace()));
             return null;
         }
     }
@@ -71,6 +74,7 @@ public class Usuario {
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
+            log.adicionarLog(String.format("Erro ao logar: %s", e.getStackTrace()));
             return null;
         }
     }

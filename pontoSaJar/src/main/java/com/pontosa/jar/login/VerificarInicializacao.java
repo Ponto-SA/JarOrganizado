@@ -17,6 +17,7 @@ import java.io.IOException;
  */
 public class VerificarInicializacao {
     public static void main(String[] args) {
+         LogError log = new LogError("VerificarInicializacao");
          try {
                 File teste = new File("./verify.txt");
                 if (teste.createNewFile()){
@@ -28,7 +29,8 @@ public class VerificarInicializacao {
                          System.out.println("Successfully wrote to the file.");
     } catch (IOException e) {
       System.out.println("An error occurred.");
-      e.printStackTrace();
+      log.adicionarLog(String.format("Erro ao verificar o arquivo de inicialização: %s",
+                            e.getStackTrace()));
     }
                 }else {
             
@@ -39,7 +41,9 @@ public class VerificarInicializacao {
 
                 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.adicionarLog(String.format(
+                    "Erro ao verificar o arquivo de inicialização: %s",
+                            e.getStackTrace()));
             }
     }
     
@@ -82,6 +86,8 @@ public class VerificarInicializacao {
                   
            
        }catch(Exception e){
+        log.adicionarLog(String.format("Erro ao verificar o arquivo de inicialização: %s",
+                            e.getStackTrace()));
           System.out.println("Error while reading file line by line:" + e.getMessage());                      
        }
     return 0;
