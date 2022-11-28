@@ -94,7 +94,7 @@ public class Dispositivo {
     public Map<String, Object> recuperarDispositivoId(String email) {
         try {
             Map<String, Object> registro = conexaoNuvem.getJdbcTemplate().queryForMap(
-                    "select dispositivo.id from dispositivo inner join usuario_maquina on dispositivo.id = usuario_maquina.fk_dispositivo inner join usuario on usuario.id = usuario_maquina.fk_usuario where usuario.email = ?", email);
+                    "select dispositivo.id from dispositivo inner join usuario_maquina on dispositivo.id = usuario_maquina.fk_dispositivo inner join usuario on usuario.id = usuario_maquina.fk_usuario where usuario.email = ? and usuario_maquina.ativo = 1", email);
 
             return registro;
         } catch (EmptyResultDataAccessException e) {
