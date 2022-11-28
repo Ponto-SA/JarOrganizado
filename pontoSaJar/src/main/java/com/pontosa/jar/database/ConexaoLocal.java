@@ -4,6 +4,7 @@
  */
 package com.pontosa.jar.database;
 
+import com.pontosa.jar.log.LogError;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -16,9 +17,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * @author ythudson
  */
-
 public class ConexaoLocal {
-    
+
+    LogError log = new LogError("Conexao-Local");
+
     private JdbcTemplate connection;
 
     private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -33,37 +35,46 @@ public class ConexaoLocal {
 
     public ConexaoLocal() {
 
-        BasicDataSource dataSource = new BasicDataSource();
+        try {
+            BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setDriverClassName(driver);
+            dataSource.setDriverClassName(driver);
 
-        dataSource.setUrl(url);
+            dataSource.setUrl(url);
 
-        dataSource.setUsername(user);
+            dataSource.setUsername(user);
 
-        dataSource.setPassword(pass);
+            dataSource.setPassword(pass);
 
-        this.connection = new JdbcTemplate(dataSource);
+            this.connection = new JdbcTemplate(dataSource);
+        } catch (Exception e) {
+            log.adicionarLog(String.format("Erro na abertura da conexao com o banco: %s",
+                    e.getStackTrace()));
+        }
     }
-    
+
     public int[] salvarEmLote(List<Double> dispositivos, Integer dispositivo, List<Integer> metricas) {
         this.getConnectionTemplate().batchUpdate("INSERT INTO historico(fk_dispositivo, fk_tipo_metrica ,registro, data_hora) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
-           @Override
+            @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                preparedStatement.setInt(1, dispositivo);
-                preparedStatement.setInt(2, metricas.get(i));
-                preparedStatement.setDouble(3, dispositivos.get(i));
-                preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
-           }
+                try {
+                    preparedStatement.setInt(1, dispositivo);
+                    preparedStatement.setInt(2, metricas.get(i));
+                    preparedStatement.setDouble(3, dispositivos.get(i));
+                    preparedStatement.setString(4, dtf.format(LocalDateTime.now()));
+                } catch (Exception e) {
+                    log.adicionarLog(String.format("Erro no salvamento em Lote: %s",
+                            e.getStackTrace()));
+                }
+            }
 
-           @Override
-           public int getBatchSize() {
+            @Override
+            public int getBatchSize() {
                 return dispositivos.size();
-           }
-       });
+            }
+        });
         return null;
     }
-    
 
     public JdbcTemplate getConnectionTemplate() {
         return connection;

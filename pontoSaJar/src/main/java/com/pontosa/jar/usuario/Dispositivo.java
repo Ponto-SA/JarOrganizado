@@ -53,7 +53,7 @@ public class Dispositivo {
             return registro;
         } catch (EmptyResultDataAccessException e) {
             log.adicionarLog(String.format(
-                    "Não foi encontrado nenhuma informação: %s",
+                    "Não foi encontrado nenhum HostName: %s",
                     e.getStackTrace()));
             return null;
         }
@@ -67,7 +67,7 @@ public class Dispositivo {
             return registro;
         } catch (EmptyResultDataAccessException e) {
             log.adicionarLog(String.format(
-                    "Não foi encontrado nenhuma informação: %s",
+                    "Não foi encontrado nenhum disco: %s",
                     e.getStackTrace()));
             return null;
         }
@@ -81,7 +81,7 @@ public class Dispositivo {
             return registro;
         } catch (EmptyResultDataAccessException e) {
             log.adicionarLog(String.format(
-                    "Não foi encontrado nenhuma informação: %s",
+                    "Não foi encontrado nenhum Dispositvo Local: %s",
                     e.getStackTrace()));
             return null;
         }
